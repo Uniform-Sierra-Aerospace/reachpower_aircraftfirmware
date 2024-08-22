@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Copyright (c) 2023 ModalAI Inc.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors
+   may be used to endorse or promote products derived from this software
+   without specific prior written permission.
+
+4. The Software is used solely in conjunction with devices provided by
+   ModalAI Inc.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+
+For a license to use on non-ModalAI hardware, please contact license@modalai.com -->
+
+<!--
+	For testing Starling With M0129 mini esc and dji mavic mini 2 motors
+	-->
+
+<EscParameters>
+
+  <IdParams>
+    <param name="id"              value="127"/>  <!-- 0-7 .. 127 means use hardware ID pins to read ID-->
+    <param name="dir"             value="2"/>    <!-- 0=fwd, 1=rev, 2=fwd id-based, 3=rev id-based -->
+  </IdParams>
+
+  <UartParams>
+    <param name="protocol_version" value="2"/>          <!-- reserved for future use -->
+    <param name="input_mode"       value="0"/>          <!-- reserved for future use -->
+    <param name="baud_rate"        value="2000000"/>    <!-- communication bit rate -->
+    <param name="char_timeout_ns"  value="0"/>          <!-- not used -->
+    <param name="cmd_timeout_ns"   value="100000000"/>  <!-- timeout for incoming commands before ESC will stop the motor -->
+  </UartParams>
+
+  <TuneParams>
+    <param name="pwm_frequency"       value="48000"/>  <!-- switching freqency of PWM signal going to motors. 24Khz and 48Khz are only options for now -->
+    <param name="vbat_nominal_mv"     value="8000"/>  <!-- used for sanity checking and limiting of voltage-dependent funcions -->
+    <param name="num_cycles_per_rev"  value="6"/>      <!-- number of pole pairs in the motor. used for converting electrical frequency to mechanical rpm -->
+    <param name="min_rpm"             value="2500"/>   <!-- minimum RPM that will be attempted, otherwise capped -->
+    <param name="max_rpm"             value="54280"/>  <!-- maximum RPM that will be attempted, otherwise capped -->
+    <param name="min_pwm"             value="40"/>     <!-- cap for minimum power to be ever applied. max is 999 -->
+    <param name="max_pwm"             value="999"/>    <!-- cap for maximum power to be ever applied. max is 999 -->
+    <param name="pwm_vs_rpm_curve_a0" value="188.680205225"/>  <!-- this is actually motor_voltage vs rpm curve.. using legacy naming -->
+    <param name="pwm_vs_rpm_curve_a1" value="0.549773039244"/> <!-- mavic mini 2 -->
+    <param name="pwm_vs_rpm_curve_a2" value="1.16023307428e-05"/>
+    <param name="kp"                  value="100"/>    <!-- RPM controller proportional gain -->
+    <param name="ki"                  value="30"/>     <!-- RPM controller proportional gain -->
+    <param name="max_kpe"             value="300"/>    <!-- maximum proportional erorr term (max is 999) -->
+    <param name="max_kie"             value="100"/>    <!-- maximum integral error term (max is 999) -->
+    <param name="max_rpm_delta"       value="2500"/>    <!-- cap for maximum rpm error used in RPM controller -->
+    
+    <param name="spinup_type"         value="0"/>      <!-- 0: traditional, 1: sinusoidal -->
+    <param name="spinup_power"        value="100"/>     <!-- power used to during spin-up procedure -->
+    <param name="latch_power"         value="100"/>     <!-- power used during latching stage of spin-up (out of 999)-->
+    <param name="spinup_power_ramp"   value="1"/>      <!-- it will take ( 4096 / (spinup_power_ramp*10000) ) seconds to ramp sinusoidal start-up power from 0 to spinup_power -->
+    <param name="spinup_rpm_target"   value="3000"/>   <!-- Desired RPM at the end of the sinusoidal spin-up procedure -->
+    <param name="spinup_time_ms"      value="2000"/>   <!-- Duration of the sinusoidal spin-up procedure -->
+    <param name="spinup_bemf_comp"    value="1"/>      <!-- 0: disable, 1:enable back-emf compensation in sinusoidal spin-up procedure -->
+    <param name="motor_kv"            value="1700"/>   <!-- silver motors are really 3600kv, but keep this at 3000kv so if these old params are used on the new black motors they will still spinup!!! -->
+    
+    <param name="min_num_cross_for_closed_loop" value="10"/>  <!-- exit latching mode of fixed power after this number of zero crossings -->
+    <param name="protection_stall_check_rpm" value="1000"/> <!-- if motor spins below this RPM, stall check will trigger and stop / restart the motor -->
+
+    <param name="brake_to_stop"       value="0"/>             <!-- apply brake when stopping motor (or not) -->
+    <param name="stall_timeout_ns"    value="20000000"/>      <!-- after spin-up, if no zero crossing is not detected for this amount of time, motor is considered stalled -->
+    <param name="require_reset_if_stalled"      value="0"/>   <!-- require sending an array of zero commands to reset before next spin-up, if motor stalled -->
+
+
+    <!-- The Entertainer -->
+    <param name="tone_freqs"          value="[118, 132, 105, 88, 99, 88, 83, 78, 1, 235, 0, 0]"/> <!-- 200 is 2000Hz, max 255 -->
+    <param name="tone_durations"      value="[30, 30, 30, 60, 30, 30, 30, 60, 60, 60, 0, 0]"/> <!-- duration of each tone in units of 10 milli-seconds. Poor naming!!! -->
+    <param name="tone_powers"         value="[30, 30, 30, 30, 14, 14, 14, 14, 0, 14, 0, 0]"/> <!-- max is 255 -->
+
+
+    <param name="dt_threshold_ns"       value="150000"/>      <!-- during start up, ignore inter-commutation times less than this val, probably noise -->
+    <param name="max_dt_ns"             value="2500000"/>     <!-- min and max values for time between two commutations. these are used as caps -->
+    <param name="min_dt_ns"             value="10000"/>
+    <param name="dt_bootstrap_ns"       value="2000000"/>     <!-- filter bootstrap value for commutation dt during start up -->
+
+    <param name="spinup_stall_dt_ns"    value="60000000"/>     <!-- during spin-up, if no zero crossing is not detected for this amount of time, motor is considered stalled -->
+    <param name="spinup_stall_check_ns" value="30000000"/>    <!-- time after beginning of spinup to start checking for spinup stall -->
+
+    <param name="alignment_time_ns"     value="0"/>           <!-- alignment time before spin-up -->
+    <param name="timing_advance"        value="0"/>
+    <param name="sense_advance"         value="0"/>
+
+    <param name="demag_timing"          value="0"/>    <!-- unused -->
+
+  </TuneParams>
+</EscParameters>
