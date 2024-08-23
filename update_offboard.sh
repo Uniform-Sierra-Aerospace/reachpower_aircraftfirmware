@@ -8,6 +8,6 @@ cd examples/offboard
 
 cmake -Bbuild -H.
 
-cmake -build build
+cmake --build build
 
 
